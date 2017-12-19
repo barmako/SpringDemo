@@ -39,7 +39,8 @@ public class VisitorInformer {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(visitor, headers);
         try {
-            restTemplate.postForObject(getVisitorUrl(), entity, String.class);
+            String s = restTemplate.postForObject(getVisitorUrl(), entity, String.class);
+            System.out.println("Result =" + s);
         } catch (Exception e) {
             System.out.println("ERROR " + e.toString());
         }
