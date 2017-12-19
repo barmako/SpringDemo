@@ -1,5 +1,8 @@
 package panda.tech.meetup.camera;
 
+import com.netflix.appinfo.InstanceInfo;
+import com.netflix.discovery.EurekaClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -20,6 +23,9 @@ public class VisitorInformer {
 
     private RestTemplate restTemplate = new RestTemplate();
 
+    @Autowired
+    private EurekaClient eurekaClient;
+
     @Scheduled(initialDelay = 3000, fixedRate = 3000)
     public void informVisitor() {
         String visitor = getVisitor();
@@ -27,15 +33,23 @@ public class VisitorInformer {
         postVisitor(visitor);
     }
 
+
     private void postVisitor(String visitor) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(visitor, headers);
         try {
-            restTemplate.postForObject("http://localhost:8080/visitor/", entity, String.class);
+            restTemplate.postForObject(getVisitorUrl(), entity, String.class);
         } catch (Exception e) {
             System.out.println("ERROR " + e.toString());
         }
+    }
+
+    private String getVisitorUrl() {
+        InstanceInfo visitor = eurekaClient.getNextServerFromEureka("visitor", false);
+        String homePageUrl = visitor.getHomePageUrl();
+        System.out.println("Visitors url by eureka - " + homePageUrl);
+        return homePageUrl + "/visitor/";
     }
 
     private String getVisitor() {
