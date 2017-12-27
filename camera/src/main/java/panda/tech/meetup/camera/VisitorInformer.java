@@ -3,6 +3,7 @@ package panda.tech.meetup.camera;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -15,13 +16,19 @@ import java.util.Random;
 @Component
 public class VisitorInformer {
 
+    @Bean
+    RestTemplate getRestTemplate(){
+        return new RestTemplate();
+    }
+
     private static Random random = new Random();
 
     private static String[] names = new String[]{"Jenny", "Karpf", "Hagbi", "Iftah", "Dennis"};
     private static String[] ranks = new String[]{"Rabat", "Samal", "Samar", "Rasal", "Kama"};
 
 
-    private RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Autowired
     private EurekaClient eurekaClient;

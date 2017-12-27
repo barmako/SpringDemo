@@ -3,6 +3,7 @@ package panda.tech.meetup.visitors;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -13,8 +14,16 @@ import java.util.List;
 @RequestMapping("/visitor")
 public class VisitorsController {
 
+    @Bean
+    RestTemplate getRestTemplate() {
+        return new RestTemplate();
+    }
+
     @Autowired
     private EurekaClient eurekaClient;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     private static List<Visitor> visitors;
 
@@ -40,8 +49,6 @@ public class VisitorsController {
 
     private boolean isIntruder(Visitor visitor) {
         String homePageUrl = getClassifierUrl();
-
-        RestTemplate restTemplate = new RestTemplate();
 
         return restTemplate.postForObject(homePageUrl, visitor, Boolean.class);
     }
