@@ -3,6 +3,9 @@ package panda.tech.meetup.visitors;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -12,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/visitor")
+@EnableBinding(Sink.class)
 public class VisitorsController {
 
     @Bean
@@ -33,6 +37,11 @@ public class VisitorsController {
         visitors.add(new Visitor("Weiss", "Captain"));
         visitors.add(new Visitor("Bukchin", "Kama"));
         visitors.add(new Visitor("Rokah", "Rabat"));
+    }
+
+    @StreamListener(Sink.INPUT)
+    public void receiveVisitor(String visitorString) {
+        System.out.println(visitorString);
     }
 
 

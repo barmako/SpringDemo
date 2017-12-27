@@ -3,10 +3,13 @@ package panda.tech.meetup.camera;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -14,10 +17,11 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Random;
 
 @Component
+@EnableBinding(Source.class)
 public class VisitorInformer {
 
     @Bean
-    RestTemplate getRestTemplate(){
+    RestTemplate getRestTemplate() {
         return new RestTemplate();
     }
 
@@ -33,11 +37,16 @@ public class VisitorInformer {
     @Autowired
     private EurekaClient eurekaClient;
 
+    @Autowired
+    private Source source;
+
     @Scheduled(initialDelay = 3000, fixedRate = 3000)
     public void informVisitor() {
         String visitor = getVisitor();
-        System.out.println("POSTING visitor " + visitor);
-        postVisitor(visitor);
+        System.out.println("AMQPing visitor " + visitor);
+        source.output().send(MessageBuilder.withPayload(visitor).build());
+//        System.out.println("POSTING visitor " + visitor);
+//        postVisitor(visitor);
     }
 
 
